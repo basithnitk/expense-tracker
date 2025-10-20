@@ -6,38 +6,56 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "skus")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@Table(
+    name = "skus",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"l1", "l2", "l3", "l4", "l5"})
+    }
+)
 public class Sku {
 
     @Id
     @GeneratedValue
     private UUID id;
 
-    private String name;
-    private String level1;
-    private String level2;
-    private String level3;
-    private String level4;
-    private String level5;
+    @Column(nullable = false)
+    private String name; // just the leaf name, can repeat under different taxonomy
+
+    private String l1;
+    private String l2;
+    private String l3;
+    private String l4;
+    private String l5;
+
+    @Column(nullable = false)
     private String unit;
 
-    private boolean active = true;
-
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
     @PrePersist
-    protected void onCreate() {
+    public void onCreate() {
         createdAt = LocalDateTime.now();
-        updatedAt = createdAt;
+        updatedAt = LocalDateTime.now();
+        validateLevels();
     }
 
     @PreUpdate
-    protected void onUpdate() {
+    public void onUpdate() {
         updatedAt = LocalDateTime.now();
+        validateLevels();
+    }
+
+    private void validateLevels() {
+        if (l1 == null || l1.isBlank()) {
+            throw new IllegalArgumentException("At least l1 must be defined for SKU hierarchy");
+        }
     }
 }
