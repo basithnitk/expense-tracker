@@ -1,0 +1,19 @@
+# Gradle
+.gradle/
+build/
+
+# Eclipse / IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
+*.log
+
+# OS
+.DS_Store
+
+# H2 Database
+data/
+
+### VS Code ###
+.vscode/
