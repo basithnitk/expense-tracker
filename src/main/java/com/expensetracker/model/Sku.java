@@ -1,4 +1,4 @@
-package com.expensetracker.expense_tracker.sku.model;
+package com.expensetracker.model;
 
 import jakarta.persistence.*;
 import lombok.*;

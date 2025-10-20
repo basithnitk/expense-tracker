@@ -1,8 +1,8 @@
-package com.expensetracker.expense_tracker.sku.repository;
+package com.expensetracker.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.expensetracker.expense_tracker.sku.model.Sku;
+import com.expensetracker.model.Sku;
 
 import java.util.UUID;
 

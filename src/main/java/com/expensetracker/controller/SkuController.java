@@ -1,9 +1,9 @@
-package com.expensetracker.expense_tracker.sku.controller;
+package com.expensetracker.controller;
 
 import org.springframework.web.bind.annotation.*;
 
-import com.expensetracker.expense_tracker.sku.model.Sku;
-import com.expensetracker.expense_tracker.sku.repository.SkuRepository;
+import com.expensetracker.model.Sku;
+import com.expensetracker.repository.SkuRepository;
 
 import java.util.List;
 import java.util.UUID;
