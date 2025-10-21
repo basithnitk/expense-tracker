@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.*;
 import com.expensetracker.model.PriceHistory;
 import com.expensetracker.model.Sku;
 import com.expensetracker.repository.SkuRepository;
+import com.expensetracker.service.PriceHistoryService;
+import com.expensetracker.service.SkuService;
 import com.expensetracker.repository.PriceHistoryRepository;
 
 import java.math.BigDecimal;
@@ -22,10 +24,15 @@ public class SkuController {
 
     private final SkuRepository repository;
     private final PriceHistoryRepository priceHistoryRepository;
+    private final SkuService skuService;
+    private final PriceHistoryService priceHistoryService;
 
-    public SkuController(SkuRepository repository, PriceHistoryRepository priceHistoryRepository) {
+    public SkuController(SkuRepository repository, PriceHistoryRepository priceHistoryRepository, SkuService skuService,
+            PriceHistoryService priceHistoryService) {
         this.repository = repository;
         this.priceHistoryRepository = priceHistoryRepository;
+        this.skuService = skuService;
+        this.priceHistoryService = priceHistoryService;
     }
 
     @GetMapping
@@ -83,6 +90,52 @@ public class SkuController {
         result.put("history", history);
 
         return result;
+    }
+
+    /**
+     * Create SKU if taxonomy not exists or return existing
+     * Optionally record price in same request
+     */
+    @PostMapping
+    public Sku createOrFetchSku(@RequestBody Sku sku,
+            @RequestParam(required = false) BigDecimal price) {
+        Sku savedSku = skuService.createOrReturnSku(sku);
+
+        if (price != null) {
+            priceHistoryService.recordPriceChange(savedSku, price);
+        }
+
+        return savedSku;
+    }
+
+    /** Search SKUs by levels (any combination) or name */
+    @GetMapping("/search")
+    public List<Sku> searchSkus(
+            @RequestParam(required = false) String l1,
+            @RequestParam(required = false) String l2,
+            @RequestParam(required = false) String l3,
+            @RequestParam(required = false) String l4,
+            @RequestParam(required = false) String l5,
+            @RequestParam(required = false) String name) {
+        return skuService.searchSkus(l1, l2, l3, l4, l5, name);
+    }
+
+    /** Get latest price of a SKU */
+    @GetMapping("/{skuId}/latest-price")
+    public BigDecimal getLatestPrice(@PathVariable UUID skuId) {
+        Optional<Sku> skuOpt = skuService.getSkuById(skuId);
+        if (skuOpt.isEmpty())
+            throw new RuntimeException("SKU not found");
+        return priceHistoryService.getLatestPrice(skuOpt.get());
+    }
+
+    /** Get full price history for a SKU */
+    @GetMapping("/{skuId}/price-history")
+    public List<PriceHistory> getPriceHistory(@PathVariable UUID skuId) {
+        Optional<Sku> skuOpt = skuService.getSkuById(skuId);
+        if (skuOpt.isEmpty())
+            throw new RuntimeException("SKU not found");
+        return priceHistoryService.getPriceHistory(skuOpt.get());
     }
 
 }

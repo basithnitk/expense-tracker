@@ -12,8 +12,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "price_history")
-public class PriceHistory {
+@Table(name = "expenses")
+public class Expense {
 
     @Id
     @GeneratedValue
@@ -24,28 +24,24 @@ public class PriceHistory {
     private Sku sku;
 
     @Column(nullable = false)
-    private BigDecimal pricePerUnit;
+    private BigDecimal quantity;
 
     @Column(nullable = false)
-    private LocalDateTime effectiveDate;
-
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private String unit;
 
     @Column(nullable = false)
-    private LocalDateTime updatedAt;
+    private BigDecimal unitPrice;
+
+    @Column(nullable = false)
+    private BigDecimal totalPrice;
+
+    @Column(nullable = false)
+    private LocalDateTime dateTime;
+
+    private String notes;
 
     @PrePersist
     public void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-        if (effectiveDate == null) {
-            effectiveDate = LocalDateTime.now();
-        }
-    }
-
-    @PreUpdate
-    public void onUpdate() {
-        updatedAt = LocalDateTime.now();
+        dateTime = LocalDateTime.now();
     }
 }
